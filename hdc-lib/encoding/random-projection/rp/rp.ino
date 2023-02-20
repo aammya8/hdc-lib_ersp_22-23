@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <iostream>
 #include <math.h>
+// statistic c library: https://github.com/christianbender/statistic
+// #include <statistic.h>
+
 using namespace std;
 
 /*
@@ -13,7 +16,8 @@ using namespace std;
  */
 
 //Applies binary quantization to all elements of the input tensor.
-void hard_quantize (& float[] x)
+//TODO: add pointers
+void hard_quantize (float x[])
 {
   // but it's not a tensor?
   // ex usage: torchhd.hard_quantize(sample_hv)
@@ -40,20 +44,26 @@ void linear ()
   
 }
 
+/*
+ * performs normalization of inputs over a specified dimension
+ */
 void normalize()
 {
   
 }
 
+/*
+ * Embedding using a nonlinear random projection
+ */
 void Sinusoid (int size, int dimensions)
 {
   weight = 
   bias = 
 
   // F.linear(input, self.weight)
-  projected = 
+  projected = linear(weight);
   // torch.cos(projected + self.bias) * torch.sin(projected)
-  output = 
+  float output[] = cos(projected + bias)*sin(projected);
   return output;
 }
 
@@ -63,7 +73,7 @@ double DIMENSIONS = 1000;
 // number of features in dataset
 double NUM_FEATURES = 5;
 
-// structs
+// struct
 struct SingleModel 
 {
     float lr;
@@ -71,15 +81,24 @@ struct SingleModel
     float project[DIMENSIONS];
     
     // encode defined within the class SingleModel
-    void encode(& float[] x) {
-      
+    float[] encode(float x[], int size) {
+      project = Sinusoid(size, DIMENSIONS);
+      return hard_quantize(project); 
     }
 
     // model_update defined within the class SingleModel
-    void model_update()
+    void model_update(float x[], int y) {
+      lr = 0.00001;
+      M = M + lr*(y-(linear(x, M)));
+      M = M.mean(0);
+    }
 
     // forward defined within the class SingleModel
-    void forward()
+    float[] forward(float x[]) {
+      float enc[] = encode(x);
+      float res[] = linear(enc, M);
+      return res;
+    }
 };
 
 // download part
