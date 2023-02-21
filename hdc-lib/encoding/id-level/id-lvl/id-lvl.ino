@@ -23,9 +23,15 @@ struct ID_Level_Encoder {
 
 
 
-void bind() {
-
-  
+void bind(float [] id, float [] value) {
+  float hv[];
+  for (int i = 0; i < id.size(); i++){
+    if (id[i]*value[i] > 0)
+      hv[i] = 1;
+    else
+      hv[i] = -1;
+  }
+  return hv;
 
 }
 
