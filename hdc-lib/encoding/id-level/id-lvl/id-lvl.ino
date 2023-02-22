@@ -2,28 +2,64 @@
 ID-Level Encoding
 */
 
-#define DIMENSIONS 10000
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+
+#define DIMENSION 10000   // Size of hypervector
 #define NUM_LEVELS 100
 
 
-struct ID_Level_Encoder {
 
-  float id[];
-  float value[];
+class ID_Level_Encoder {
 
-  ID_Level_Encoder() {
-    id = 
-  }
+  public:
+    float id[];
+    float value[];
+    int num_vectors;
+
+    /* 
+     * Return array of random binary hypervectors (1 and -1)
+     * Each row in array corresponds to different random hypervector
+     * e.g. row 0 corresponds to hv0, row 1 to hv1, etc. 
+    */
+    float[][] random_hv() {
+
+      // 2-D array to store all num_vectors random binary hypervectors
+      float random_hv_set[num_vectors][DIMENSION];
+
+      // generate random hypervectors
+      for (int i = 0; i < num_vectors; i++) {
+
+      }
 
 
+    }
 
 
+    float[] level_hv() {
+
+    }
+
+
+    /* Constructor */
+    ID_Level_Encoder(int n) {
+      num_vectors = n;
+      id = random_hv();
+      value = level_hv();
+    }
+
+
+  private:
 
 }
 
 
 
-void bind(float [] weight, float [] value) {
+
+float[] bind(float [] weight, float [] value) {
   float hv[];
   for (int i = 0; i < weight.size(); i++){
     if (weight[i]*value[i] > 0)
@@ -34,10 +70,10 @@ void bind(float [] weight, float [] value) {
   return hv;
 }
 
-void multiset(float [] sample) {
+float[] multiset(float [] sample) {
   float hv[];
-  float total;
   for (int i = 0; i < sample[0].size(); i++){
+    float total;
     for (int j = 0; j < sample[0].size(); i++)
       total += sample[i][j];
     hv[i] = total;
@@ -45,7 +81,7 @@ void multiset(float [] sample) {
   return hv;
 }
 
-void hard_quantize(float [] sample){
+float[] hard_quantize(float [] sample){
   float hv[];
   for (int i = 0; i < sample.size(); i++){
     if (sample[i] > 0)
@@ -57,9 +93,7 @@ void hard_quantize(float [] sample){
 }
 
 
-void id_level_encoder(int num_classes, int size) {
-
-}
+// void id_level_encoder(int num_classes, int size) {}
 
 
 void setup() {
