@@ -2,7 +2,6 @@
 ID-Level Encoding
 */
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -10,7 +9,6 @@ ID-Level Encoding
 
 #define DIMENSION 10000   // Size of hypervector
 #define NUM_LEVELS 100
-
 
 
 class ID_Level_Encoder {
@@ -30,15 +28,26 @@ class ID_Level_Encoder {
       // 2-D array to store all num_vectors random binary hypervectors
       float random_hv_set[num_vectors][DIMENSION];
 
-      // generate random hypervectors
-      for (int i = 0; i < num_vectors; i++) {
-
+      // Generate random hypervectors
+      // https://www.includehelp.com/c-programs/generate-random-numbers-within-a-range.aspx
+      int lower = 0;
+      int upper = 1;
+      srand(time(0));
+      for (int hv = 0; hv < num_vectors; hv++) {
+        for (int element = 0; element < DIMENSION; element++) {
+          random_hv_set[hv][element] = (float) (rand() % (upper - lower + 1)) + lower;
+          printf("%f ", random_hv_set[hv][element]);
+        }
+        printf("\n");
       }
 
-
+      return random_hv_set;
     }
 
 
+    /*
+     * 
+     */
     float[] level_hv() {
 
     }
