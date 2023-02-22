@@ -23,22 +23,37 @@ struct ID_Level_Encoder {
 
 
 
-void bind(float [] id, float [] value) {
+void bind(float [] weight, float [] value) {
   float hv[];
-  for (int i = 0; i < id.size(); i++){
-    if (id[i]*value[i] > 0)
+  for (int i = 0; i < weight.size(); i++){
+    if (weight[i]*value[i] > 0)
       hv[i] = 1;
     else
       hv[i] = -1;
   }
   return hv;
-
 }
 
+void multiset(float [] sample) {
+  float hv[];
+  float total;
+  for (int i = 0; i < sample[0].size(); i++){
+    for (int j = 0; j < sample[0].size(); i++)
+      total += sample[i][j];
+    hv[i] = total;
+  }
+  return hv;
+}
 
-void hard_quantize() {
-
-
+void hard_quantize(float [] sample){
+  float hv[];
+  for (int i = 0; i < sample.size(); i++){
+    if (sample[i] > 0)
+      hv[i] = 1;
+    else
+      hv[i] = -1;
+  }
+  return hv;
 }
 
 
