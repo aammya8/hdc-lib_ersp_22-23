@@ -74,7 +74,7 @@ float[] bind(float [] weight, float [] value) {
     if (weight[i]*value[i] > 0)
       hv[i] = 1;
     else
-      hv[i] = -1;
+      hv[i] = 0;
   }
   return hv;
 }
@@ -96,7 +96,7 @@ float[] hard_quantize(float [] sample){
     if (sample[i] > 0)
       hv[i] = 1;
     else
-      hv[i] = -1;
+      hv[i] = 0;
   }
   return hv;
 }
