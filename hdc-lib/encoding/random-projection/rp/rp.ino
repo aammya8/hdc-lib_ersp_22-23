@@ -30,7 +30,7 @@ void hard_quantize (float x[])
   //if item <= 0
   //item = 0
   //else: item = 1
-  for(int i = 0; i < sizeOf(x); i++) {
+  for(int i = 0; i < x.size(); i++) {
     if (x[i] < 0) {
         x[i] = 0;
     } else {
@@ -38,10 +38,20 @@ void hard_quantize (float x[])
     }
   }
 }
-
-void linear ()
-{
-  
+/*
+multiply by the weight and add the bias
+*/
+ void linear(float *input, float *weight, float *output) {
+    // Iterate over the elements of the output vector
+    for (int i = 0; i < output.size(); i++) {
+        //Initialize the i-th element of the output vector to zero
+        output[i] = 0;
+        // Iterate over the columns of the weight matrix
+        for (int j = 0; j < DIMENSIONS; j++) {
+            //dot product of the input vector and the weight matrix
+            output[i] += input[j] * weight[i*COLS + j];
+        }
+    }
 }
 
 /*
