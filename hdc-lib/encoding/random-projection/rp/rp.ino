@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <iostream>
 #include <math.h>
+#include <random>
+#include <vector>
 // statistic c library: https://github.com/christianbender/statistic
 // #include <statistic.h>
 
@@ -77,40 +79,69 @@ void Sinusoid (int size, int dimensions)
   return output;
 }
 
-// number of hypervector dimensions
-double DIMENSIONS = 1000;
+// // number of hypervector dimensions
+// double DIMENSIONS = 1000;
 
-// number of features in dataset
-double NUM_FEATURES = 5;
+// // number of features in dataset
+// double NUM_FEATURES = 5;
 
-// struct
-struct SingleModel 
-{
+// // struct
+// struct SingleModel 
+// {
+//     float lr;
+//     float M[DIMENSIONS];
+//     float project[DIMENSIONS];
+    
+//     // encode defined within the class SingleModel
+//     float[] encode(float x[], int size) {
+//       project = Sinusoid(size, DIMENSIONS);
+//       return hard_quantize(project); 
+//     }
+
+//     // model_update defined within the class SingleModel
+//     void model_update(float x[], int y) {
+//       lr = 0.00001;
+//       M = M + lr*(y-(linear(x, M)));
+//       M = M.mean(0);
+//     }
+
+//     // forward defined within the class SingleModel
+//     float[] forward(float x[]) {
+//       float enc[] = encode(x);
+//       float res[] = linear(enc, M);
+//       return res;
+//     }
+// };
+
+class RP_Encoder {
+  public:
     float lr;
     float M[DIMENSIONS];
     float project[DIMENSIONS];
-    
+
+    /* Constructor */
+    RP_Encoder() : lr(0.00001), M(), project() {}
+
     // encode defined within the class SingleModel
-    float[] encode(float x[], int size) {
+    vector<float> encode(vector<float> x, int size) {
       project = Sinusoid(size, DIMENSIONS);
       return hard_quantize(project); 
     }
 
     // model_update defined within the class SingleModel
-    void model_update(float x[], int y) {
+    void model_update(vector<float> x, int y) {
       lr = 0.00001;
       M = M + lr*(y-(linear(x, M)));
       M = M.mean(0);
     }
 
     // forward defined within the class SingleModel
-    float[] forward(float x[]) {
+    vector<float> forward(vector<float> x) {
       float enc[] = encode(x);
       float res[] = linear(enc, M);
       return res;
     }
-};
-
+}
 // download part
 
 
