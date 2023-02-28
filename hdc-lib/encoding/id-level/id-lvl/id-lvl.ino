@@ -17,6 +17,7 @@ class ID_Level_Encoder {
     float id[];
     float value[];
     int num_vectors;
+    float sample_hv[];
 
     /* 
      * Return array of random binary hypervectors (1 and -1)
@@ -51,6 +52,41 @@ class ID_Level_Encoder {
     float[] level_hv() {
 
     }
+  
+    float[][] bind(float [] weight, float [] value) {
+      float hv[][];
+      for (int i = 0; i < weight.size(); i++){
+        for (int j = 0; i < weight[0].size(); i++){
+          if (weight[i][j]*value[i][j] > 0)
+            hv[i][j] = 1;
+          else
+            hv[i][j] = 0;
+        }
+      }
+      return hv;
+    }
+
+    float[] multiset(float [] sample) {
+      float hv[];
+      for (int i = 0; i < sample[0].size(); i++){
+        float total;
+        for (int j = 0; j < sample[0].size(); i++)
+          total += sample[i][j];
+          hv[i] = total;
+        }
+        return hv;
+    }
+
+    float[] hard_quantize(float [] sample){
+      float hv[];
+      for (int i = 0; i < sample.size(); i++){
+        if (sample[i] > 0)
+          hv[i] = 1;
+        else
+          hv[i] = 0;
+      }
+      return hv;
+    }
 
 
     /* Constructor */
@@ -58,7 +94,12 @@ class ID_Level_Encoder {
       num_vectors = n;
       id = random_hv();
       value = level_hv();
+      
     }
+  
+    ID_Level_Forward(float[] id, float [] x){
+      sample_hv = multiset(bind(id,x));
+      return hard_queantize(sample_hv);
 
 
   private:
@@ -66,40 +107,6 @@ class ID_Level_Encoder {
 }
 
 
-
-
-float[] bind(float [] weight, float [] value) {
-  float hv[];
-  for (int i = 0; i < weight.size(); i++){
-    if (weight[i]*value[i] > 0)
-      hv[i] = 1;
-    else
-      hv[i] = 0;
-  }
-  return hv;
-}
-
-float[] multiset(float [] sample) {
-  float hv[];
-  for (int i = 0; i < sample[0].size(); i++){
-    float total;
-    for (int j = 0; j < sample[0].size(); i++)
-      total += sample[i][j];
-    hv[i] = total;
-  }
-  return hv;
-}
-
-float[] hard_quantize(float [] sample){
-  float hv[];
-  for (int i = 0; i < sample.size(); i++){
-    if (sample[i] > 0)
-      hv[i] = 1;
-    else
-      hv[i] = 0;
-  }
-  return hv;
-}
 
 
 // void id_level_encoder(int num_classes, int size) {}
