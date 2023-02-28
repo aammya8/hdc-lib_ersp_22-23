@@ -101,7 +101,7 @@ class ID_Level_Encoder {
       sample_hv = multiset(bind(id,x));
       return hard_queantize(sample_hv);
 
-
+    }
   private:
 
 }
