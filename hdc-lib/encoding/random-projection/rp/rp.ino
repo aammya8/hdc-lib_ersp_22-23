@@ -19,7 +19,7 @@ using namespace std;
 
 //Applies binary quantization to all elements of the input tensor.
 //TODO: add pointers
-void hard_quantize (float x[])
+void hard_quantize (vector<float> x)
 {
   // but it's not a tensor?
   // ex usage: torchhd.hard_quantize(sample_hv)
@@ -42,28 +42,41 @@ void hard_quantize (float x[])
 }
 
 /*
-multiply by the weight and add the bias
-*/
- void linear(float *input, float *weight, float *output) {
-    // Iterate over the elements of the output vector
-    for (int i = 0; i < output.size(); i++) {
-        //Initialize the i-th element of the output vector to zero
-        output[i] = 0;
-        // Iterate over the columns of the weight matrix
-        for (int j = 0; j < DIMENSIONS; j++) {
-            //dot product of the input vector and the weight matrix
-            output[i] += input[j] * weight[i*COLS + j];
-        }
-    }
-}
+ * multiply by the weight and add the bias
+ */
+//  void linear(float input, float weight, float output) {
+//     // Iterate over the elements of the output vector
+//     for (int i = 0; i < output.size(); i++) {
+//         //Initialize the i-th element of the output vector to zero
+//         output[i] = 0;
+//         // Iterate over the columns of the weight matrix
+//         for (int j = 0; j < DIMENSIONS; j++) {
+//             //dot product of the input vector and the weight matrix
+//             output[i] += input[j] * weight[i*COLS + j];
+//         }
+//     }
+// }
 
 /*
- * performs normalization of inputs over a specified dimension
+ * performs normalization of inputs by rows (dimension = 1)
  */
-// void normalize()
-// {
-  
-// }
+void normalize(vector<vector<float>> input)
+{
+  // work on each row in the 2d vector
+  for(vector<float> row: input){
+    // calculate magnitude of the row
+    float magnitude = 0;
+    for(float x: row){
+      magnitude += x*x;
+    }
+    magnitude = sqrt(magnitude);
+
+    // normalize the x
+    for (float x: row) {
+      x = x/magnitude;
+    }
+  }
+}
 
 
 /*
@@ -78,21 +91,19 @@ multiply by the weight and add the bias
  // DONE - Step 1: generate the random empty matrix with dimensions of out_features
  // DONE - Step 2: fill matrix with random normal distribution values  with LIBRARY
  // weight = https://www.tutorialspoint.com/generate-random-numbers-following-a-normal-distribution-in-c-cplusplus
- // Step 3: normalize weight? NOT THIS WEEK
+ // DONE - Step 3: normalize weight
  //
 
 vector<float> Projection(int in_features, int out_features, vector<float> tensor){
-  //instantiating matrix with rows
+  // instantiating matrix with rows
   vector<vector<float>> weight(out_features);
 
-  //instantiating each row with the number of columns
+  // instantiating each row with the number of columns
   for (int i = 0; i < out_features; ++i){
     weight[i].resize(in_features);
   }
 
-  //filling matrix with rnd normal distribution
-  // QUESTION: do we call normal distribution for every single cell?
-  
+  // filling matrix with rnd normal distribution
   default_random_engine generator;
   normal_distribution<float> distribution(0,1);
 
@@ -101,6 +112,9 @@ vector<float> Projection(int in_features, int out_features, vector<float> tensor
       weight[row][col] = distribution(generator);
     }
   }
+
+  // normalize weight
+  normalize(weight);
 
   // instantiating hypervector
   vector<float> result; 
@@ -133,33 +147,35 @@ class RP_Encoder {
     // encode defined within the class SingleModel
     vector<float> encode(vector<float> x, int size) {
       this->project = Projection(size, DIMENSIONS, x);
-      return hard_quantize(this->project); 
+      hard_quantize(this->project); 
+      return this->project;
     }
 
-    // model_update defined within the class SingleModel
-    void model_update(vector<float> x, int y) {
-      // What is lr, and how are they multiplying by x?
-      // What does this equation do?
-      vector<float> update = this->M + this->lr*(y-(linear(x, this->M)))*x;
-      update = update.mean(0);
-      this->M = update;
-    }
+     /*
+     * model_update: creates a model for linear regression
+     * used for reghd.py, but ours is random projection
+     */
+    // void model_update(vector<float> x, int y) {
+    //   vector<float> update = this->M + this->lr*(y-(linear(x, this->M)))*x;
+    //   update = update.mean(0);
+    //   this->M = update;
+    // }
 
     // forward defined within the class SingleModel
-    vector<float> forward(vector<float> x) {
-      vector<float> enc = encode(x, x.size());
-      vector<float> res = linear(enc, this->M);
-      return res;
-    }
+    // vector<float> forward(vector<float> x) {
+    //   vector<float> enc = encode(x, x.size());
+    //   // vector<float> res = linear(enc, this->M); NOT NECESSARY FOR RP
+    //   return res;
+    // }
 }
 // download part
 
 
 // Get necessary statistics for data and target transform
-double STD_DEVS
-double MEANS 
-double TARGET_STD
-double TARGET_MEAN
+// double STD_DEVS
+// double MEANS 
+// double TARGET_STD
+// double TARGET_MEAN
 
 // transform function
 
@@ -246,13 +262,22 @@ vector<float> x = {-0.0438,  0.7912,  0.8622, -0.0146, -0.4780, -0.6660, -0.9750
           0.7546,  0.4110,  0.2270,  0.2392, -0.0062, -0.0062,  0.1166, -0.0674,
           0.0798,  0.2148,  0.2270,  0.2638, -0.1166, -0.0062,  0.0184, -0.1780,
          -0.2760};
+int y = 21;
 
 void setup() {
   // put your setup code here, to run once:
 
   // initializing encoder
   RP_Encoder();
+  RP_Encoder np;
 
+  // call encode method
+  vector<float> sample = np.encode(x, y);
+
+  for(float x: sample){
+    cout << x << endl;
+  }
+  cout << endl;
   
 }
 
