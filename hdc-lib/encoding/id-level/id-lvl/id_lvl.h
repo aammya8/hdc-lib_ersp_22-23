@@ -27,7 +27,7 @@ class ID_Level_Encoder {
 
     ID_Level_Encoder(int);
     double[][] random_hv();
-    double[][] level_hv();
+    double[][] level_hv(); // generate level hypervectors
     double[][] bind(double [] weight, double [] value);
     double[] multiset(double [] sample);
     double[] hard_quantize(double [] sample);
