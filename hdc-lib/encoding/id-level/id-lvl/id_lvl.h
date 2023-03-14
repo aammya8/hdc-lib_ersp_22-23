@@ -35,7 +35,7 @@ class ID_Level_Encoder {
 
   private:
     double id[];
-    double value[];
+    double level[];
     int num_vectors;
     double sample_hv[];
 

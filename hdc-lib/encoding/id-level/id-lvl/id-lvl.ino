@@ -9,7 +9,7 @@ ID-Level Encoding
 ID_Level_Encoder::ID_Level_Encoder(int n) {
   num_vectors = n;
   id = random_hv();
-  value = level_hv();
+  level = level_hv();
 }
 
 
@@ -95,11 +95,37 @@ double[][] ID_Level_Encoder::level_hv() {
 
 
 
-double[][] ID_Level_Encoder::bind(double [] weight, double [] value) {
+double[][] ID_Level_Encoder::bind(double [] id, double [] value) {
+  const double range_from = 0.0;
+  const double range_to = 1.0;
+  std::default_random_engine generator;
+  std::uniform_int_distribution<double>  distr(range_from, range_to);
+  int target[num_vectors];
   double hv[][];
-  for (int i = 0; i < weight.size(); i++){
-    for (int j = 0; i < weight[0].size(); i++){
-      if (weight[i][j]*value[i][j] > 0)
+  double[DIMENSION] threshold_v; // ceil(span) x DIMENSION = 1 x DIMENSION
+
+  for (int i = 0; i < DIMENSION; i++) {
+    double n = i/DIMENSION;
+    threshold_v[i] = n;
+  }
+
+  for (int i = 0; i < num_vectors; i++) {
+    //generate index for each value 
+    double pick = threshold_v[0];
+    int index = 0;
+    while (value[i] > threshold_v[index]){
+      index++;
+    }
+    pick = min(threshold_v[index]-value[i], value[i]-threshold_v[index])
+    if (pick == threshold_v[index-1])
+      index--;
+    target[i] = index
+  }
+
+  for (int i = 0; i < num_vectors; i++){
+    int index = targte[i];
+    for (int j = 0; i < DIMENSION; i++){
+      if (id[index][j]*level[index][j] > 0)
         hv[i][j] = 1;
       else
         hv[i][j] = 0;
@@ -137,10 +163,12 @@ double[] ID_Level_Encoder::hard_quantize(double [] sample){
 
 
 
-double[] ID_Level_Encoder::ID_Level_Forward(double[] id, double [] x) {
+double[] ID_Level_Encoder::ID_Level_Forward(double [] x) {
 
   // TODO
-  
+  double smple_hv[][] = bind(id, x)
+  double result = multiset(smple_hv)
+  return hard_quantize(x);
 }
 
 
@@ -150,6 +178,9 @@ void setup() {
   // put your setup code here, to run once:
   int num_vec = isolet.size();
   ID_Level_Encoder encoder = new ID_Level_Encoder(num_vec);
+  double forWard[] = encoder.forward(x);
+  for (int i = 0; i < num_vec; i++)
+    cout << forWard[i];
 }
 
 void loop() {
