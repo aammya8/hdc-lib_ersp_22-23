@@ -24,7 +24,6 @@ double[][] ID_Level_Encoder::random_hv() {
     double random_hv_set[num_vectors][DIMENSION];
 
     // Generate random hypervectors
-    // https://www.includehelp.com/c-programs/generate-random-numbers-within-a-range.aspx
     int lower = 0;
     int upper = 1;
     srand(time(0));
@@ -43,7 +42,7 @@ double[][] ID_Level_Encoder::random_hv() {
 
 
 double[][] ID_Level_Encoder::level_hv() {
-  int levels_per_span = (1 - RANDOMNESS) * (num_vectors - 1) + RANDOMNESS * 1; // RANDOMNESS defined as 0
+  int levels_per_span = (1 - RANDOMNESS) * (num_vectors - 1) + RANDOMNESS * 1; 
   levels_per_span = max(levels_per_span, 1);
   int span = (num_vectors - 1) / levels_per_span;
 
@@ -55,8 +54,8 @@ double[][] ID_Level_Encoder::level_hv() {
 
   /* 
    * Generate 2 random hv for min hv (L1) and max hv (Lm) in span
-   * https://pytorch.org/docs/stable/generated/torch.rand.html
-   * After bits flipped in for-loop below in agreement with https://arxiv.org/pdf/2205.07920.pdf, L1 and Lm will share exactly d/2 bits, making them precisely orthogonal
+   * After bits flipped in for-loop below in agreement with https://arxiv.org/pdf/2205.07920.pdf, 
+   * L1 and Lm will share exactly d/2 bits, making them precisely orthogonal
    */
   double[ceil(span+1)][DIMENSION] span_hv; // 2 x DIMENSION
   for (int i = 0; i < DIMENSION; i++) {
@@ -80,7 +79,7 @@ double[][] ID_Level_Encoder::level_hv() {
   for (int i = 0; i < num_vectors; i++) {
     int span_idx = (int) floor(i / levels_per_span);
 
-    // NOTE: special case check ignored for now
+    // NOTE: special case not included for now
 
     int level_within_span = i % levels_per_span;
 
@@ -155,5 +154,7 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
+
+  // ?
 
 }
