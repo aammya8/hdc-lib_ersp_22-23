@@ -47,30 +47,31 @@ double[][] ID_Level_Encoder::level_hv() {
   levels_per_span = max(levels_per_span, 1);
   int span = (num_vectors - 1) / levels_per_span;
 
-  double[ceil(span+1)][DIMENSION] span_hv; // 2 x DIMENSION
-
-  // 2 orthogal hv FOR SPAN_HV
-  // min hv is filled with zero
-  // max hv filled with ones
-  // ALTERNATE: https://codereview.stackexchange.com/questions/229457/algorithm-that-generates-orthogonal-vectors-c-implementation 
-  for (int i = 0; i < DIMENSION; i++) {
-    span_hv[0][i] = 0;
-    span_hv[1][i] = 1;
-  }
-
-
-  double[DIMENSION] threshold_v; // 1 x DIMENSION
-
-  /* Generate random threshold */
-  // https://stackoverflow.com/questions/288739/generate-random-numbers-uniformly-over-an-entire-range
-  // https://cplusplus.com/reference/random/uniform_real_distribution/
+  /* Random number generator (Uniform Real Distribution from 0 to 1) */
   const double range_from = 0.0;
   const double range_to = 1.0;
   std::default_random_engine generator;
   std::uniform_int_distribution<double>  distr(range_from, range_to);
+
+  /* 
+   * Generate 2 random hv for min hv (L1) and max hv (Lm) in span
+   * https://pytorch.org/docs/stable/generated/torch.rand.html
+   * After bits flipped in for-loop below in agreement with https://arxiv.org/pdf/2205.07920.pdf, L1 and Lm will share exactly d/2 bits, making them precisely orthogonal
+   */
+  double[ceil(span+1)][DIMENSION] span_hv; // 2 x DIMENSION
   for (int i = 0; i < DIMENSION; i++) {
-    double num = distribution(generator);
-    threshold_v[i] = num;
+    double n1 = distribution(generator);
+    span_hv[0][i] = n1;
+    double n2 = distribution(generator);
+    span_hv[1][i] = n2;
+  }
+
+
+  /* Generate random threshold */
+  double[DIMENSION] threshold_v; // ceil(span) x DIMENSION = 1 x DIMENSION
+  for (int i = 0; i < DIMENSION; i++) {
+    double n = distribution(generator);
+    threshold_v[i] = n;
   }
 
 
@@ -81,7 +82,7 @@ double[][] ID_Level_Encoder::level_hv() {
 
     // NOTE: special case check ignored for now
 
-    int level_within_span = i % levels_per_span
+    int level_within_span = i % levels_per_span;
 
     double t = 1 - (level_within_span / levels_per_span); // threshold value from start_hv perspective
 
@@ -89,7 +90,6 @@ double[][] ID_Level_Encoder::level_hv() {
     double[] span_end_hv = span_hv[span_idx + 1];
     hv[i] = (threshold_v[span_idx] < t) ? span_start_hv : span_end_hv;
   }
-
 
   return hv;
 }
