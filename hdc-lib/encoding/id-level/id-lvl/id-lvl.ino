@@ -166,9 +166,10 @@ double[] ID_Level_Encoder::hard_quantize(double [] sample){
 double[] ID_Level_Encoder::ID_Level_Forward(double [] x) {
 
   // TODO
-  double smple_hv[][] = bind(id, x)
-  double result = multiset(smple_hv)
-  return hard_quantize(x);
+  sample_hv = bind(id, x)
+  sample_hv = multiset(sample_hv)
+  sample_hv = hard_quantize(sample_hv);
+  return sample_hv;
 }
 
 
@@ -178,9 +179,9 @@ void setup() {
   // put your setup code here, to run once:
   int num_vec = isolet.size();
   ID_Level_Encoder encoder = new ID_Level_Encoder(num_vec);
-  double forWard[] = encoder.forward(x);
+  double [] sample = encoder.ID_Level_Forward();
   for (int i = 0; i < num_vec; i++)
-    cout << forWard[i];
+    cout << sample[i];
 }
 
 void loop() {
