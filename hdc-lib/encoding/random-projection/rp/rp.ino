@@ -167,7 +167,7 @@ class RP_Encoder {
     //   // vector<float> res = linear(enc, this->M); NOT NECESSARY FOR RP
     //   return res;
     // }
-}
+};
 // download part
 
 
