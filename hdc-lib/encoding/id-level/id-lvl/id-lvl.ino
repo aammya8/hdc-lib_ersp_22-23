@@ -52,13 +52,14 @@ double[][] ID_Level_Encoder::level_hv() {
   // 2 orthogal hv FOR SPAN_HV
   // min hv is filled with zero
   // max hv filled with ones
+  // ALTERNATE: https://codereview.stackexchange.com/questions/229457/algorithm-that-generates-orthogonal-vectors-c-implementation 
   for (int i = 0; i < DIMENSION; i++) {
     span_hv[0][i] = 0;
     span_hv[1][i] = 1;
   }
 
 
-  double[ceil(span)][DIMENSION] threshold_v; // 1 x DIMENSION
+  double[DIMENSION] threshold_v; // 1 x DIMENSION
 
   /* Generate random threshold */
   // https://stackoverflow.com/questions/288739/generate-random-numbers-uniformly-over-an-entire-range
@@ -69,7 +70,7 @@ double[][] ID_Level_Encoder::level_hv() {
   std::uniform_int_distribution<double>  distr(range_from, range_to);
   for (int i = 0; i < DIMENSION; i++) {
     double num = distribution(generator);
-    threshold_v[1][i] = num;
+    threshold_v[i] = num;
   }
 
 
