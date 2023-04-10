@@ -1,7 +1,7 @@
 #ifndef id_lvl_h
 #define id_lvl_h
 
-#include "Arduino.h"
+//#include "Arduino.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,18 +26,18 @@ class ID_Level_Encoder {
   public:
 
     ID_Level_Encoder(int);
-    double[][] random_hv();
-    double[][] level_hv(); // generate level hypervectors
-    double[][] bind(double [] weight, double [] value);
-    double[] multiset(double [] sample);
-    double[] hard_quantize(double [] sample);
-    double[] ID_Level_Forward(double[] id, double [] x);
+    double** random_hv();
+    double** level_hv(); // generate level hypervectors
+    double** bind(double* value);
+    double* multiset(double** sample);
+    double* hard_quantize(double* sample);
+    double* ID_Level_Forward(double* x);
 
   private:
-    double id[];
-    double level[];
+    double** id;
+    double** level;
     int num_vectors;
-    double sample_hv[];
+    double* sample_hv;
 
 };
 
