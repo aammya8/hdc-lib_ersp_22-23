@@ -87,8 +87,8 @@ double y[617] = {-0.0438,  0.7912,  0.8622, -0.0146, -0.4780, -0.6660, -0.9750, 
 
 ID_Level_Encoder::ID_Level_Encoder(int n) {
   num_vectors = n;
-  id = random_hv();
-  level = level_hv();
+  random_hv();
+  level_hv();
 }
 
 
@@ -97,28 +97,23 @@ ID_Level_Encoder::ID_Level_Encoder(int n) {
   * Each row in array corresponds to different random hypervector
   * e.g. row 0 corresponds to hv0, row 1 to hv1, etc. 
 */
-double** ID_Level_Encoder::random_hv() {
+void ID_Level_Encoder::random_hv() {
 
     // 2-D array to store all num_vectors random binary hypervectors
-    //[num_vectors][DIMENSION]
-    double **random_hv_set;
     // Generate random hypervectors
-    int lower = 0;
-    int upper = 1;
     for (int hv = 0; hv < num_vectors; hv++) {
       for (int element = 0; element < DIMENSION; element++) {
-        random_hv_set[hv][element] = (double) (rand() % (upper - lower + 1)) + lower;
-        printf("%f ", random_hv_set[hv][element]);
+        id[hv][element] = double (rand()%2);
+        //printf("%f ", random_hv_set[hv][element]);
       }
-      printf("\n");
+      //printf("\n");
     }
-    return random_hv_set;
 }
 
 
 
 
-double** ID_Level_Encoder::level_hv() {
+void ID_Level_Encoder::level_hv() {
   int levels_per_span = (1 - RANDOMNESS) * (num_vectors - 1) + RANDOMNESS * 1; 
   levels_per_span = max(levels_per_span, 1);
   int span = (num_vectors - 1) / levels_per_span;
@@ -128,7 +123,6 @@ double** ID_Level_Encoder::level_hv() {
   const double range_to = 1.0;
   std::default_random_engine generator;
   std::uniform_real_distribution<double>  distr(range_from, range_to);
-
   /* 
    * Generate 2 random hv for min hv (L1) and max hv (Lm) in span
    * After bits flipped in for-loop below in agreement with https://arxiv.org/pdf/2205.07920.pdf, 
@@ -152,8 +146,6 @@ double** ID_Level_Encoder::level_hv() {
   }
 
 
-  double **hv; // empty hypervectors
-
   for (int i = 0; i < num_vectors; i++) {
     int span_idx = (int) floor(i / levels_per_span);
 
@@ -165,28 +157,28 @@ double** ID_Level_Encoder::level_hv() {
 
     double span_start_hv[DIMENSION];
     double span_end_hv[DIMENSION];
+      
     for (int j = 0; j < DIMENSION; i++){
-        span_start_hv[j] = span_hv[span_idx][j];
-        span_end_hv[j] = span_hv[span_idx + 1][j];
-        hv[i][j] = (threshold_v[span_idx] < t) ? span_start_hv[j] : span_end_hv[j];
+        span_start_hv[j] = double(rand()%2);
+        span_end_hv[j] = double(rand()%2);
+        level[i][j] = (threshold_v[span_idx] < t) ? span_start_hv[j] : span_end_hv[j];
+        //Error Core dumped here
     }
 
   }
 
-  return hv;
 }
 
 
 
-double** ID_Level_Encoder::bind(double* value) {
+void ID_Level_Encoder::bind(double* value) {
   const double range_from = 0.0;
   const double range_to = 1.0;
   int target[num_vectors];
-  double** hv;
-  double threshold_v[DIMENSION]; // ceil(span) x DIMENSION = 1 x DIMENSION
+  double threshold_v[num_vectors]; // ceil(span) x DIMENSION = 1 x DIMENSION
 
-  for (int i = 0; i < DIMENSION; i++) {
-    double n = i/DIMENSION;
+  for (int i = 0; i < num_vectors; i++) {
+    double n = double(double(i)/(num_vectors-1));
     threshold_v[i] = n;
   }
 
@@ -197,70 +189,80 @@ double** ID_Level_Encoder::bind(double* value) {
     while (value[i] > threshold_v[index]){
       index++;
     }
+      
     pick = min(threshold_v[index]-value[i], value[i]-threshold_v[index]);
     if (pick == threshold_v[index-1])
       index--;
     target[i] = index;
   }
 
+
   for (int i = 0; i < num_vectors; i++){
     int index = target[i];
-    for (int j = 0; i < DIMENSION; i++){
-      if ((id[index][j]) * (level[index][j]) > 0)
-        hv[i][j] = 1;
-      else
-        hv[i][j] = 0;
+    for (int j = 0; j < DIMENSION; j++){
+      cout << level[index][j] << " ";
+      //if ((id[index][j] * level[index][j]) > 0)
+          hv[i][j] = 1;
     }
   }
-  return hv;
 }
 
 
 
-double* ID_Level_Encoder::multiset(double** sample) {
-  double* hv; 
+void ID_Level_Encoder::multiset() {
   for (int i = 0; i < num_vectors; i++){
     double total;
     for (int j = 0; j < DIMENSION; i++)
-      total += sample[i][j];
-      hv[i] = total;
+      total += hv[i][j];
+      sample_hv[i] = total;
     }
-    return hv;
 }
 
 
 
-double* ID_Level_Encoder::hard_quantize(double* sample){
-  double* hv;
+void ID_Level_Encoder::hard_quantize(){
   for (int i = 0; i < num_vectors; i++){
-    if (sample[i] > 0)
-      hv[i] = 1;
+    if (sample_hv[i] > 0)
+      sample_hv[i] = 1;
     else
-      hv[i] = 0;
+      sample_hv[i] = 0;
   }
-  return hv;
 }
 
 
 
 
-double* ID_Level_Encoder::ID_Level_Forward(double* x) {
+void ID_Level_Encoder::ID_Level_Forward(double* x) {
 
   // TODO
-  sample_hv = multiset(bind(x));
-  sample_hv = hard_quantize(sample_hv);
-  return sample_hv;
+  bind(x);
+  multiset();
+  hard_quantize();
 }
 
-
-void setup() {
+/*
+int main() {
   // put your setup code here, to run once:
   srand(time(0));
   int num_vec = isolet.size();
   ID_Level_Encoder* encoder = new ID_Level_Encoder(num_vec);
-  double* sample = encoder->ID_Level_Forward(y);
+  encoder->ID_Level_Forward(y);
+  double* sample = encoder->sample_hv;
   for (int i = 0; i < num_vec; i++)
     cout << sample[i];
+  return 0;
+}*/
+
+
+void setup() {
+  srand(time(0));
+  int num_vec = isolet.size();
+  ID_Level_Encoder* encoder = new ID_Level_Encoder(num_vec);
+  encoder->ID_Level_Forward(y);
+  double* sample = encoder->sample_hv;
+  /*for (int i = 0; i < num_vec; i++)
+    cout << sample[i];
+  return 0;*/
 }
 
 void loop() {

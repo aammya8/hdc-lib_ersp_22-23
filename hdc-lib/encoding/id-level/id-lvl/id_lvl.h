@@ -25,19 +25,20 @@ class ID_Level_Encoder {
 
   public:
 
-    ID_Level_Encoder(int);
-    double** random_hv();
-    double** level_hv(); // generate level hypervectors
-    double** bind(double* value);
-    double* multiset(double** sample);
-    double* hard_quantize(double* sample);
-    double* ID_Level_Forward(double* x);
+    ID_Level_Encoder(int n);
+    void random_hv();
+    void level_hv(); // generate level hypervectors
+    void bind(double* value);
+    void multiset();
+    void hard_quantize();
+    void ID_Level_Forward(double* x);
+    double sample_hv[617];
 
   private:
-    double** id;
-    double** level;
+    double id[617][DIMENSION];
+    double level[617][DIMENSION];
     int num_vectors;
-    double* sample_hv;
+    double hv[617][DIMENSION];
 
 };
 
