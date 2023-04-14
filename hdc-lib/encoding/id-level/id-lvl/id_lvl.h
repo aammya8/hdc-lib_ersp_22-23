@@ -37,6 +37,7 @@ class ID_Level_Encoder {
   private:
     double id[617][DIMENSION];
     double level[617][DIMENSION];
+    double threshold_v[617];
     int num_vectors;
     double hv[617][DIMENSION];
 
