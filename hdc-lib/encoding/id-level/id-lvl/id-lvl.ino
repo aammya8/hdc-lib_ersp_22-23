@@ -252,8 +252,6 @@ void ID_Level_Encoder::hard_quantize(){
 
 
 void ID_Level_Encoder::ID_Level_Forward(double* x) {
-
-  // TODO
   bind(x);
   multiset();
   hard_quantize();
@@ -281,7 +279,7 @@ void setup() {
   double* sample = encoder->sample_hv;
   for (int i = 0; i < num_vec; i++)
     cout << sample[i];
-  return 0;
+  //return 0;
 }
 
 
