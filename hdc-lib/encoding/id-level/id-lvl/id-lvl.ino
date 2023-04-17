@@ -240,7 +240,7 @@ void ID_Level_Encoder::multiset() {
 
 
 void ID_Level_Encoder::hard_quantize(){
-  for (int i = 0; i < num_vectors; i++){
+  for (int i = 0; i < DIMENSION; i++){
     if (sample_hv[i] > 0)
       sample_hv[i] = 1;
     else
@@ -265,7 +265,7 @@ void ID_Level_Encoder::ID_Level_Forward(double* x) {
   ID_Level_Encoder* encoder = new ID_Level_Encoder(num_vec);
   encoder->ID_Level_Forward(y);
   double* sample = encoder->sample_hv;
-  for (int i = 0; i < num_vec; i++)
+  for (int i = 0; i < DIMENSION; i++)
     cout << sample[i];
   cout << endl;
   return 0;
@@ -278,7 +278,7 @@ void setup() {
   ID_Level_Encoder* encoder = new ID_Level_Encoder(num_vec);
   encoder->ID_Level_Forward(y);
   double* sample = encoder->sample_hv;
-  for (int i = 0; i < num_vec; i++)
+  for (int i = 0; i < DIMENSION; i++)
     cout << sample[i];
 }
 
