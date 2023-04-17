@@ -107,7 +107,8 @@ vector<float> Projection(int in_features, int out_features, vector<float>tensor)
     weight[i].resize(in_features);
   }
   // filling matrix with rnd normal distribution
-  default_random_engine generator;
+  srand(time(NULL)); // Set a random seed value
+  default_random_engine generator(rand()); // Use the seed value for the random engine
   normal_distribution<float> distribution(0,1);
 
   for (int row = 0; row < out_features; ++row){
