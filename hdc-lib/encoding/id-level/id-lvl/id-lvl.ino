@@ -261,12 +261,13 @@ void ID_Level_Encoder::ID_Level_Forward(double* x) {
 /*int main() {
   // put your setup code here, to run once:
   srand(time(0));
-  int num_vec = isolet.size();
+  int num_vec = sizeof(y)/sizeof(y[0]); // size of isolet dataset
   ID_Level_Encoder* encoder = new ID_Level_Encoder(num_vec);
   encoder->ID_Level_Forward(y);
   double* sample = encoder->sample_hv;
   for (int i = 0; i < num_vec; i++)
     cout << sample[i];
+  cout << endl;
   return 0;
 }*/
 
@@ -279,7 +280,6 @@ void setup() {
   double* sample = encoder->sample_hv;
   for (int i = 0; i < num_vec; i++)
     cout << sample[i];
-  //return 0;
 }
 
 
