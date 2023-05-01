@@ -273,13 +273,7 @@ void ID_Level_Encoder::ID_Level_Forward(double* x) {
 
 
 void setup() {
-  srand(time(0));
-  int num_vec = sizeof(y)/sizeof(y[0]); // size of isolet dataset
-  ID_Level_Encoder* encoder = new ID_Level_Encoder(num_vec);
-  encoder->ID_Level_Forward(y);
-  double* sample = encoder->sample_hv;
-  for (int i = 0; i < DIMENSION; i++)
-    cout << sample[i];
+  Serial.begin(9600);
 }
 
 
@@ -287,6 +281,17 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
 
-  // ?
+  srand(time(0));
+  int num_vec = sizeof(y)/sizeof(y[0]); // size of isolet dataset
+  ID_Level_Encoder* encoder = new ID_Level_Encoder(num_vec);
+  encoder->ID_Level_Forward(y);
+  double* sample = encoder->sample_hv;
 
+  for (int i = 0; i < DIMENSION; i++) {
+    // cout << sample[i];
+    Serial.print(String(sample[i]));
+    if (i < (DIMENSION - 1)) {
+      Serial.print(", ");
+    }
+  }
 }
