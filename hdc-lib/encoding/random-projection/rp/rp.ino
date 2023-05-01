@@ -1,43 +1,103 @@
 /*
- * Arduino version code
+ * C++ version code
  */
+// imports
 #include <stdio.h>
+#include <iostream>
 #include <math.h>
 #include <random>
 #include <vector>
+// statistic c library: https://github.com/christianbender/statistic
+// #include <statistic.h>
 
 using namespace std;
+// number of hypervector dimensions
+const unsigned int DIMENSIONS = 1000;
 
-// Applies binary quantization to all elements of the input tensor.
-vector<float> hard_quantize(vector<float> x)
-{
-    vector<float> hqVector(x.size());
-    for (int i = 0; i < x.size(); i++) {
-        if (x[i] <= 0) {
-            hqVector[i] = -1;
-        } else {
-            hqVector[i] = 1;
-        }
-    }
-    return hqVector;
-}
+// number of features in dataset
+const unsigned NUM_FEATURES = 5;
+
+/*
+ * Torch functions:
+ * hard_quantize
+ * Sinusoid
+ * linear 
+ * normalize
+ */
+
+// //Applies binary quantization to all elements of the input tensor.
+// float[] hard_quantize (float x[]){
+  
+//   float hqVector[sizeof(x)];
+//   for(int i = 0; i < sizeof(x); i++) {
+//     if (x[i] <= 0) {
+//         hqVector[i] = -1;
+//         //hqVector.push_back(0);
+//     } else {
+//       hqVector[i] = 1;
+//       //hqVector.push_back(1);
+//     }
+//   }
+//   return hqVector;
+// }
+
+// vector<float> hard_quantize (vector<float> x)
+// {
+//   // ex usage: torchhd.hard_quantize(sample_hv)
+//   //tensor([ 2.,  0., -2.,  0.,  2.,  0.])
+//   // >>> torchhd.hard_quantize(y)
+//   //tensor([ 1., -1., -1., -1.,  1., -1.])
+//   // torch.bincount(input, weights=None, minlength=0)
+
+//   //for item in array
+//   //if item <= 0
+//   //item = 0
+//   //else: item = 1
+//   vector<float> hqVector(x.size());
+//   for(int i = 0; i < x.size(); i++) {
+//     if (x[i] <= 0) {
+//         hqVector[i] = -1;
+//         //hqVector.push_back(0);
+//     } else {
+//       hqVector[i] = 1;
+//       //hqVector.push_back(1);
+//     }
+//   }
+//   return hqVector;
+// }
+
+/*
+ * multiply by the weight and add the bias
+ */
+//  void linear(float input, float weight, float output) {
+//     // Iterate over the elements of the output vector
+//     for (int i = 0; i < output.size(); i++) {
+//         //Initialize the i-th element of the output vector to zero
+//         output[i] = 0;
+//         // Iterate over the columns of the weight matrix
+//         for (int j = 0; j < DIMENSIONS; j++) {
+//             //dot product of the input vector and the weight matrix
+//             output[i] += input[j] * weight[i*COLS + j];
+//         }
+//     }
+// }
 
 /*
  * performs normalization of inputs by rows (dimension = 1)
  */
-void normalize(vector<vector<float>> &input)
+void normalize(float input[DIMENSIONS][5])
 {
-    for (vector<float> &row: input){
-        float magnitude = 0;
-        for (float x: row){
-            magnitude += x*x;
-        }
-        magnitude = sqrt(magnitude);
-
-        for (float &x: row) {
-            x = x / magnitude;
-        }
+  // work on each row in the 2d vector
+  for(int i = 0; i < DIMENSIONS; ++i){
+    float magnitude = 0;
+    for(int j=0; j < 5; ++j){
+      magnitude +=input[i][j]*input[i][j];
     }
+    magnitude = sqrt(magnitude);
+    for (int j=0; j < 5; ++j) {
+      input[i][j] = input[i][j]/magnitude;
+    }
+  }
 }
 
 /*
@@ -48,87 +108,109 @@ void normalize(vector<vector<float>> &input)
  * @return = random generated hypervector
  */
 
-// CREATING THE RANDOM MATRIX
-// Step 1: generate the random empty matrix with dimensions of out_features
-// Step 2: fill matrix with random normal distribution values
-// Step 3: normalize weight
-vector<float> Projection(int in_features, int out_features, vector<float> tensor)
-{
-    vector<vector<float>> weight(out_features);
-    for (int i = 0; i < out_features; ++i){
-        weight[i].resize(in_features);
+float* Projection(int in_features, int out_features, float tensor[5]){
+  // instantiating matrix with rows and columns
+  float weight[out_features][5];
+  
+  // filling matrix with rnd normal distribution
+  srand(time(NULL)); // Set a random seed value
+  default_random_engine generator(rand()); // Use the seed value for the random engine
+  normal_distribution<float> distribution(0,1);
+
+  for (int row = 0; row < out_features; ++row){
+    for(int col = 0; col < in_features; ++col){
+      weight[row][col] = distribution(generator);
     }
-    default_random_engine generator;
-    normal_distribution<float> distribution(0,1);
+  }
 
-    for (int row = 0; row < out_features; ++row){
-        for (int col = 0; col < in_features; ++col){
-            weight[row][col] = distribution(generator);
-        }
+  // normalize weight
+  normalize(weight);
+
+  // instantiating hypervector
+  float result[out_features]; 
+
+  // MATRIX MULTIPLICATION SECTION
+  for (int r = 0; r < out_features; ++r){
+    for (int c = 0; c < in_features; ++c){
+       result[r] += weight[r][c]*tensor[c];
     }
+  }
 
-    normalize(weight);
-
-    vector<float> result(out_features);
-
-    for (int r = 0; r < out_features; ++r){
-        for (int c = 0; c < in_features; ++c){
-            result[r] += weight[r][c] * tensor[c];
-        }
-    }
-
-    return result;
+  return result;
 }
 
-// number of hypervector dimensions
-const float DIMENSIONS = 1000;
+// class RP_Encoder {
+//   public:
+//     float lr;
+//     float M[DIMENSIONS];
+//     float project[DIMENSIONS];
 
-// number of features in dataset
-const float NUM_FEATURES = 5;
+//     /* Constructor */
+//     RP_Encoder() : lr(0.00001), M, project {}
 
-class RP_Encoder {
-    public:
-        float lr;
-        vector<float> M;
-        vector<float> project;
+//     // encode defined within the class SingleModel
+//     float[] encode(float x[], int size) {
+//       this->project = Projection(size, DIMENSIONS, x);
+//       this->project = hard_quantize(this->project); 
+//       return this->project;
+//     }
 
-        /* Constructor */
-        RP_Encoder() : lr(0.00001), M(DIMENSIONS), project(DIMENSIONS) {}
+//      /*
+//      * model_update: creates a model for linear regression
+//      * used for reghd.py, but ours is random projection
+//      */
+//     // void model_update(vector<float> x, int y) {
+//     //   vector<float> update = this->M + this->lr*(y-(linear(x, this->M)))*x;
+//     //   update = update.mean(0);
+//     //   this->M = update;
+//     // }
 
-        // encode defined within the class SingleModel
-        vector<float> encode(vector<float> x, int size) {
-            this->project = Projection(size, DIMENSIONS, x);
-            this->project = hard_quantize(this->project);
-            return this->project;
-        }
+//     // forward defined within the class SingleModel
+//     // vector<float> forward(vector<float> x) {
+//     //   vector<float> enc = encode(x, x.size());
+//     //   // vector<float> res = linear(enc, this->M); NOT NECESSARY FOR RP
+//     //   return res;
+//     // }
+// };
 
-        /*
-         * model_update: creates a model for linear regression
-         * used for reghd.py, but ours is random projection
-         */
-        // void model_update(vector<float> x, int y) {
-        //   vector<float> update =...
-        // }
-};
+
 
 
 void setup() {
-  vector<float> x = {-0.6624, -0.3334, 0.3666, 0.4292, -0.2084};
-  RP_Encoder np;
-  vector<float> sample = np.encode(x, x.size());
+  // correct output: ([[-1.,  1., -1.,  ..., -1.,  1., -1.]])
+  // RP_Encoder np;
+  // vector<float> sample = np.encode(x, x.size());
+  //Serial.begin(9600);
   Serial.begin(9600);
-  Serial.print("[");
-  for (int i = 0; i < sample.size(); i++) {
-    Serial.print(sample[i], DEC);
-    if (i != sample.size() - 1) {
-      Serial.print(", ");
-    }
-  }
-  Serial.println("]");
+  //Serial.print("[");
+  // for (int i = 0; i < sample.size(); i++) {
+  //   Serial.print(sample[i]);
+  //   if (i != sample.size() - 1) {
+  //     Serial.print(", ");
+  //   }
+  // }
+  // Serial.println("]");
   
 }
 
+static char outstr[5];
+
 void loop() {
   // put your main code here, to run repeatedly:
-
+  float x[5] = {-0.6624, -0.3334, 0.3666, 0.4292, -0.2084};
+  // RP_Encoder np;
+  // float sample[] = np.encode(x, 5);
+  float *sample;
+  sample = Projection(5, DIMENSIONS, x);
+  Serial.println("hello world");
+  //Serial.println("[");
+  for (int i = 0; i < 5; i++) {
+    //dtostrf(sample[i],5, 1, outstr);
+    
+    Serial.print(String(sample[i]));
+    if (i != 5 - 1) {
+      Serial.print(", ");
+    }
+  }
+  //Serial.println("]");
 }
