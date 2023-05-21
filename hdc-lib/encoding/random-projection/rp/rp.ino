@@ -1,33 +1,39 @@
-/*
- * C++ version code
- */
 // imports
 #include <stdio.h>
 #include <iostream>
 #include <math.h>
 #include <random>
 #include <vector>
-// statistic c library: https://github.com/christianbender/statistic
-// #include <statistic.h>
-
 using namespace std;
+
 // number of hypervector dimensions
-const unsigned int DIMENSIONS = 4;
+const unsigned int DIMENSIONS = 300;
 
 // number of features in dataset
-const unsigned NUM_FEATURES = 5;
+const unsigned NUM_FEATURES = 10;
 
 /*
- * Torch functions:
- * hard_quantize
- * Sinusoid
- * linear 
- * normalize
+ * hamming_distance_similarity: finds the bit difference between two hypervectors
+ * @param hamming_distance - an integer variable to be filled with how many bits differ
+ * @param hv1 - a hypervector to be compared
+ * @param hv2 - a hypervector to be compared
  */
+void hamming_distance_similarity(int & hamming_distance, float hv1[DIMENSIONS], float hv2[DIMENSIONS]){
+  hamming_distance = 0;
 
-// //Applies binary quantization to all elements of the input tensor.
-void hard_quantize (float x[5]){
-  for(int i = 0; i < sizeof(x); i++) {
+  for (int i = 0; i < DIMENSIONS; i++) {
+    if (hv1[i] != hv2[i]) {
+      hamming_distance++;
+    }
+  }
+}
+
+/*
+ * hard_quantize: applies binary quantization to all elements of the input tensor
+ * @param x - a vector with positive and negative float values
+ */
+void hard_quantize (float x[DIMENSIONS]){
+  for(int i = 0; i < DIMENSIONS; i++) {
     if (x[i] <= 0) {
         x[i] = -1;
     } else {
@@ -36,35 +42,34 @@ void hard_quantize (float x[5]){
   }
 }
 
-
 /*
- * multiply by the weight and add the bias
+ * normalize: performs normalization of inputs by rows (dimension = 1)
+ * @param input - a 2D vector with random normal distribution values
  */
-
-
-void normalize(float input[DIMENSIONS][5])
+void normalize(float input[DIMENSIONS][10])
 {
   // work on each row in the 2d vector
   for(int i = 0; i < DIMENSIONS; ++i){
     float magnitude = 0;
-    for(int j=0; j < 5; ++j){
+    for(int j=0; j < 10; ++j){
       magnitude +=input[i][j]*input[i][j];
     }
     magnitude = sqrt(magnitude);
-    for (int j=0; j < 5; ++j) {
+    for (int j=0; j < 10; ++j) {
       input[i][j] = input[i][j]/magnitude;
     }
   }
 }
 
 /*
- * performs normalization of inputs by rows (dimension = 1)
+ * Projection: does matrix multiplication with the input tensor/data (vector<float>)
+ * and a randomly generated matrix to produce a random hypervector
+ * @param in_features = dimension of the input vector
+ * @param out_features (1000) = output dimension of the hypervector
  */
-
-
-void Projection(int in_features, int out_features, float tensor[5], float result[DIMENSIONS]){
+void Projection(int in_features, int out_features, float tensor[10], float result[DIMENSIONS]){
   // instantiating matrix with rows and columns
-  float weight[out_features][5];
+  float weight[out_features][10];
   
   // filling matrix with rnd normal distribution
   srand(time(NULL)); // Set a random seed value
@@ -74,7 +79,6 @@ void Projection(int in_features, int out_features, float tensor[5], float result
   for (int row = 0; row < out_features; ++row){
     for(int col = 0; col < in_features; ++col){
       weight[row][col] = distribution(generator);
-      //Serial.println(weight[row][col]);
     }
   }
 
@@ -86,33 +90,54 @@ void Projection(int in_features, int out_features, float tensor[5], float result
     for (int c = 0; c < in_features; ++c){
        result[r] += weight[r][c]*tensor[c];
     }
-    //Serial.println(result[r]);
   }
 }
 
-// /*
-//  * Projection: does matrix multiplication with the input tensor/data (vector<float>)
-//  * and a randomly generated matrix to produce a random hypervector
-//  * @param in_features = dimension of the input vector
-//  * @param out_features (1000) = output dimension of the hypervector
-//  * @return = random generated hypervector
-//  */
-
-
 void setup() {
   Serial.begin(9600);
-  float x[5] = {-0.6624, -0.3334, 0.3666, 0.4292, -0.2084};
-  float result[DIMENSIONS] = {0};
+  //class: 25
+  float SameC1[10] = {-0.5752,  0.0264,  0.4010,  0.3694, -0.2164, -0.3166, -0.3694, -0.4828,
+         -0.5198, -0.3878};
+  float SameC2[10] = {-0.6498,  0.0556,  0.2536,  0.2632, -0.2632, -0.3672, -0.4542, -0.4710,
+         -0.4324, -0.3478};
+  //class: 0
+  float DiffC[10] = {-0.5038, -0.2724, -0.0958,  0.4004,  0.7352,  0.8326,  0.4978,  0.1902,
+          0.1050,  0.1812};
   
-  Projection(5, DIMENSIONS, x, result);
-  hard_quantize(result);
-  //Serial.println(result[0]);
-  for (int i = 0; i < 5; ++i) {
-    Serial.print(i);
-    Serial.print(" ");
-    Serial.println(result[i]);
-  }
+  //initializing empty vectors
+  float resultC1[DIMENSIONS] = {0};
+  float resultC2[DIMENSIONS] = {0};
+  float resultDiffC[DIMENSIONS] = {0};
+
+  //initializing empty hamming distances
+  int hamming_distanceSame = 0;
+  int hamming_distance1vDiff = 0;
+  int hamming_distance2vDiff = 0;
   
+  //Generating random hyper vectors for each tensor
+  Projection(10, DIMENSIONS, SameC1, resultC1);
+  hard_quantize(resultC1);
+
+  Projection(10, DIMENSIONS, SameC2, resultC2);
+  hard_quantize(resultC2);
+
+  Projection(10, DIMENSIONS, DiffC, resultDiffC);
+  hard_quantize(resultDiffC);
+
+  //Finding the difference between each pair of hyper vectors
+  hamming_distance_similarity(hamming_distanceSame, resultC1, resultC2);
+  hamming_distance_similarity(hamming_distance1vDiff, resultC1, resultDiffC);
+  hamming_distance_similarity(hamming_distance2vDiff, resultC2, resultDiffC);
+
+  //Printing the differences
+  Serial.print("Same class diff: ");
+  Serial.println(hamming_distanceSame);
+
+  Serial.print("Diff class between first and different: ");
+  Serial.println(hamming_distance1vDiff);
+
+  Serial.print("Diff class between second and different: ");
+  Serial.println(hamming_distance2vDiff);
 }
 
 void loop() {
