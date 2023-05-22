@@ -27,10 +27,10 @@ class ID_Level_Encoder {
     ID_Level_Encoder(int n);
     void random_hv();
     void level_hv(); // generate level hypervectors
-    void bind(float* value);
+    void bind(float value[]);
     void multiset();
     void hard_quantize();
-    void ID_Level_Forward(float* x);
+    void ID_Level_Forward(float x[]);
     float sample_hv[617];
 
   private:

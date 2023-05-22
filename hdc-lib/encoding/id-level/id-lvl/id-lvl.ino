@@ -206,7 +206,7 @@ void ID_Level_Encoder::level_hv() {
 
 
 
-void ID_Level_Encoder::bind(float* value) {
+void ID_Level_Encoder::bind(float value[]) {
   const double range_from = 0.0;
   const double range_to = 1.0;
   int target[num_vectors];
@@ -263,7 +263,7 @@ void ID_Level_Encoder::hard_quantize(){
 
 
 
-void ID_Level_Encoder::ID_Level_Forward(float* x) {
+void ID_Level_Encoder::ID_Level_Forward(float x[]) {
   bind(x);
   multiset();
   hard_quantize();
