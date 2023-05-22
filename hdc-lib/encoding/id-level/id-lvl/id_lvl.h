@@ -4,16 +4,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <iostream>
-#include <algorithm>
-#include <cmath>
-#include <random>
+#include <math.h>
 
 using namespace std;
 
-#define DIMENSION 100   // Size of hypervector
+#define DIMENSION 10  // Size of hypervector
 #define NUM_LEVELS 10
 #define RANDOMNESS 0
+#define num_vertcors 10
 
 
 // https://docs.arduino.cc/learn/contributions/arduino-creating-library-guide
@@ -23,20 +21,20 @@ class ID_Level_Encoder {
   public:
 
     ID_Level_Encoder(int n);
+    //~ID_Level_Encoder(int n);
     void random_hv();
     void level_hv(); // generate level hypervectors
-    void bind(float value[]);
+    void bind(float* value);
     void multiset();
     void hard_quantize();
-    void ID_Level_Forward(float x[]);
-    float sample_hv[617];
+    void ID_Level_Forward(float* x);
+    int sample_hv[DIMENSION];
 
   private:
-    float id[617][DIMENSION];
-    float level[617][DIMENSION];
-    float threshold_v[617];
+    char id[num_vertcors][DIMENSION/8+1];
+    char level[num_vertcors][DIMENSION/8+1];
     int num_vectors;
-    float hv[617][DIMENSION];
+    char hv[num_vertcors][DIMENSION/8+1];
 
 };
 
