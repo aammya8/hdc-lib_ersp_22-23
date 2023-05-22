@@ -3,7 +3,6 @@ ID-Level Encoding
 */
 
 #include "id_lvl.h"
-#include "Arduino.h"
 
 // float y[617] = {-0.0438,  0.7912,  0.8622, -0.0146, -0.4780, -0.6660, -0.9750, -0.7704,
 //          -0.9164, -0.9416, -0.7828, -0.8456, -0.5282, -0.4906, -0.2318, -0.0814,
@@ -351,8 +350,33 @@ void loop() {
 /*
  * C code:
  */
-/*int main() {
-  // put your setup code here, to run once:
+int main() {
+
+  //isolet class: 25
+  float SameC1[10] = {-0.5752,  0.0264,  0.4010,  0.3694, -0.2164, -0.3166, -0.3694, -0.4828,
+         -0.5198, -0.3878};
+  float SameC2[10] = {-0.6498,  0.0556,  0.2536,  0.2632, -0.2632, -0.3672, -0.4542, -0.4710,
+         -0.4324, -0.3478};
+  //isolet class: 0
+  float DiffC[10] = {-0.5038, -0.2724, -0.0958,  0.4004,  0.7352,  0.8326,  0.4978,  0.1902,
+          0.1050,  0.1812};
+
+
+  int num_vec1 = sizeof(SameC1)/sizeof(SameC1[0]); // size of data sample
+  ID_Level_Encoder* enc1 = new ID_Level_Encoder(num_vec1);
+  enc1->ID_Level_Forward(SameC1);
+  float* resultC1 = enc1->sample_hv;
+
+  int num_vec2 = sizeof(SameC2)/sizeof(SameC2[0]); // size of data sample
+  ID_Level_Encoder* enc2 = new ID_Level_Encoder(num_vec2);
+  enc1->ID_Level_Forward(SameC2);
+  float* resultC2 = enc2->sample_hv;
+
+  int num_vec3 = sizeof(DiffC)/sizeof(DiffC[0]); // size of data sample
+  ID_Level_Encoder* enc_diff = new ID_Level_Encoder(num_vec3);
+  enc1->ID_Level_Forward(SameC1);
+  float* resultDiffC = enc_diff->sample_hv;
+
   srand(time(0));
   int num_vec = sizeof(y)/sizeof(y[0]); // size of isolet dataset
   ID_Level_Encoder* encoder = new ID_Level_Encoder(num_vec);
@@ -361,5 +385,6 @@ void loop() {
   for (int i = 0; i < DIMENSION; i++)
     cout << sample[i];
   cout << endl;
+  
   return 0;
-}*/
+}
