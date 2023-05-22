@@ -284,18 +284,18 @@ void setup() {
           0.1050,  0.1812};
 
 
-  int num_vec = sizeof(SameC1)/sizeof(SameC1[0]); // size of data sample
-  ID_Level_Encoder* enc1 = new ID_Level_Encoder(num_vec);
+  int num_vec1 = sizeof(SameC1)/sizeof(SameC1[0]); // size of data sample
+  ID_Level_Encoder* enc1 = new ID_Level_Encoder(num_vec1);
   enc1->ID_Level_Forward(SameC1);
   float* resultC1 = enc1->sample_hv;
 
-  int num_vec = sizeof(SameC2)/sizeof(SameC2[0]); // size of data sample
-  ID_Level_Encoder* enc2 = new ID_Level_Encoder(num_vec);
+  int num_vec2 = sizeof(SameC2)/sizeof(SameC2[0]); // size of data sample
+  ID_Level_Encoder* enc2 = new ID_Level_Encoder(num_vec2);
   enc1->ID_Level_Forward(SameC2);
   float* resultC2 = enc2->sample_hv;
 
-  int num_vec = sizeof(DiffC)/sizeof(DiffC[0]); // size of data sample
-  ID_Level_Encoder* enc_diff = new ID_Level_Encoder(num_vec);
+  int num_vec3 = sizeof(DiffC)/sizeof(DiffC[0]); // size of data sample
+  ID_Level_Encoder* enc_diff = new ID_Level_Encoder(num_vec3);
   enc1->ID_Level_Forward(SameC1);
   float* resultDiffC = enc_diff->sample_hv;
 
