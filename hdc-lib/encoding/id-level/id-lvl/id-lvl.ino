@@ -3,7 +3,6 @@ ID-Level Encoding
 */
 
 #include "id_lvl.h"
-#include "Arduino.h"
 
 //class: 25
 float a[10] = {-0.5752,  0.0264,  0.4010,  0.3694, -0.2164, -0.3166, -0.3694, -0.4828,
