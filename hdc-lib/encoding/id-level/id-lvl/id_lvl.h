@@ -14,7 +14,7 @@
 
 using namespace std;
 
-#define DIMENSION 10000   // Size of hypervector
+#define DIMENSION 1000   // Size of hypervector
 #define NUM_LEVELS 100
 #define RANDOMNESS 0
 
