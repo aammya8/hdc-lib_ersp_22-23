@@ -284,15 +284,6 @@ void setup() {
           0.1050,  0.1812};
 
 
-  //initializing empty hypervectors
-  // float resultC1[DIMENSION] = {0};
-  // float resultC2[DIMENSION] = {0};
-  // float resultDiffC[DIMENSION] = {0};
-
-
-
-
-
   int num_vec = sizeof(SameC1)/sizeof(SameC1[0]); // size of data sample
   ID_Level_Encoder* enc1 = new ID_Level_Encoder(num_vec);
   enc1->ID_Level_Forward(SameC1);
@@ -335,35 +326,26 @@ void setup() {
 
 
 
-
-
-
-
-
 void loop() {
   // put your main code here, to run repeatedly:
 
-  /* 
-  srand(time(0));
-  int num_vec = sizeof(y)/sizeof(y[0]); // size of isolet dataset
-  ID_Level_Encoder* encoder = new ID_Level_Encoder(num_vec);
-  encoder->ID_Level_Forward(y);
-  double* sample = encoder->sample_hv;
+  // srand(time(0));
+  // int num_vec = sizeof(y)/sizeof(y[0]); // size of isolet dataset
+  // ID_Level_Encoder* encoder = new ID_Level_Encoder(num_vec);
+  // encoder->ID_Level_Forward(y);
+  // float* sample = encoder->sample_hv;
 
-  for (int i = 0; i < DIMENSION; i++) {
-    // cout << sample[i];
-    Serial.print(String(sample[i]));
-    if (i < (DIMENSION - 1)) {
-      Serial.print(", ");
-    }
-  }
-  */
-
+  // for (int i = 0; i < DIMENSION; i++) {
+  //   Serial.print(String(sample[i]));
+  //   if (i < (DIMENSION - 1)) {
+  //     Serial.print(", ");
+  //   }
+  // }
 }
 
 
 
-// -------------------------------------------------------------
+// -----------------------------------------------------------------------
 
 /*
  * C code:
@@ -374,7 +356,7 @@ void loop() {
   int num_vec = sizeof(y)/sizeof(y[0]); // size of isolet dataset
   ID_Level_Encoder* encoder = new ID_Level_Encoder(num_vec);
   encoder->ID_Level_Forward(y);
-  double* sample = encoder->sample_hv;
+  float* sample = encoder->sample_hv;
   for (int i = 0; i < DIMENSION; i++)
     cout << sample[i];
   cout << endl;
