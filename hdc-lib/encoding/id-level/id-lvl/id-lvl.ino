@@ -274,50 +274,51 @@ void ID_Level_Encoder::ID_Level_Forward(float* x) {
 void setup() {
   Serial.begin(9600);
 
-  //class: 25
+  //isolet class: 25
   float SameC1[10] = {-0.5752,  0.0264,  0.4010,  0.3694, -0.2164, -0.3166, -0.3694, -0.4828,
          -0.5198, -0.3878};
   float SameC2[10] = {-0.6498,  0.0556,  0.2536,  0.2632, -0.2632, -0.3672, -0.4542, -0.4710,
          -0.4324, -0.3478};
-  //class: 0
+  //isolet class: 0
   float DiffC[10] = {-0.5038, -0.2724, -0.0958,  0.4004,  0.7352,  0.8326,  0.4978,  0.1902,
           0.1050,  0.1812};
 
 
-  //initializing empty vectors
-  float resultC1[DIMENSION] = {0};
-  float resultC2[DIMENSION] = {0};
-  float resultDiffC[DIMENSION] = {0};
+  //initializing empty hypervectors
+  // float resultC1[DIMENSION] = {0};
+  // float resultC2[DIMENSION] = {0};
+  // float resultDiffC[DIMENSION] = {0};
+
+
+
+
+
+  int num_vec = sizeof(SameC1)/sizeof(SameC1[0]); // size of data sample
+  ID_Level_Encoder* enc1 = new ID_Level_Encoder(num_vec);
+  enc1->ID_Level_Forward(SameC1);
+  float* resultC1 = enc1->sample_hv;
+
+  int num_vec = sizeof(SameC2)/sizeof(SameC2[0]); // size of data sample
+  ID_Level_Encoder* enc2 = new ID_Level_Encoder(num_vec);
+  enc1->ID_Level_Forward(SameC2);
+  float* resultC2 = enc2->sample_hv;
+
+  int num_vec = sizeof(DiffC)/sizeof(DiffC[0]); // size of data sample
+  ID_Level_Encoder* enc_diff = new ID_Level_Encoder(num_vec);
+  enc1->ID_Level_Forward(SameC1);
+  float* resultDiffC = enc_diff->sample_hv;
+
+
 
   //initializing empty hamming distances
   int hamming_distanceSame = 0;
   int hamming_distance1vDiff = 0;
   int hamming_distance2vDiff = 0;
 
-
-  int num_vec = sizeof(SameC1)/sizeof(SameC1[0]); // size of data sample
-  ID_Level_Encoder* enc1 = new ID_Level_Encoder(num_vec);
-  enc1->ID_Level_Forward(SameC1);
-  double* sample = enc1->sample_hv;
-
-
-
-
-  //Generating random hyper vectors for each tensor
-  Projection(10, DIMENSIONS, SameC1, resultC1);
-  hard_quantize(resultC1);
-
-  Projection(10, DIMENSIONS, SameC2, resultC2);
-  hard_quantize(resultC2);
-
-  Projection(10, DIMENSIONS, DiffC, resultDiffC);
-  hard_quantize(resultDiffC);
-
   //Finding the difference between each pair of hyper vectors
   hamming_distance_similarity(hamming_distanceSame, resultC1, resultC2);
   hamming_distance_similarity(hamming_distance1vDiff, resultC1, resultDiffC);
   hamming_distance_similarity(hamming_distance2vDiff, resultC2, resultDiffC);
-
 
 
   //Printing the differences

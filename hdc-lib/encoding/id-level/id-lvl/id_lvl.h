@@ -32,14 +32,14 @@ class ID_Level_Encoder {
     void multiset();
     void hard_quantize();
     void ID_Level_Forward(float* x);
-    double sample_hv[617];
+    float sample_hv[617];
 
   private:
-    double id[617][DIMENSION];
-    double level[617][DIMENSION];
-    double threshold_v[617];
+    float id[617][DIMENSION];
+    float level[617][DIMENSION];
+    float threshold_v[617];
     int num_vectors;
-    double hv[617][DIMENSION];
+    float hv[617][DIMENSION];
 
 };
 
