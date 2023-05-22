@@ -4,7 +4,7 @@ ID-Level Encoding
 
 #include "id_lvl.h"
 
-double y[617] = {-0.0438,  0.7912,  0.8622, -0.0146, -0.4780, -0.6660, -0.9750, -0.7704,
+float y[617] = {-0.0438,  0.7912,  0.8622, -0.0146, -0.4780, -0.6660, -0.9750, -0.7704,
          -0.9164, -0.9416, -0.7828, -0.8456, -0.5282, -0.4906, -0.2318, -0.0814,
           0.3068,  0.6534,  0.9416,  0.9040,  0.8664,  0.8080,  0.9708,  1.0000,
           1.0000,  0.8246,  0.7828,  0.6702,  0.5782,  0.6076,  0.6660,  0.4614,
@@ -82,6 +82,19 @@ double y[617] = {-0.0438,  0.7912,  0.8622, -0.0146, -0.4780, -0.6660, -0.9750, 
           0.7546,  0.4110,  0.2270,  0.2392, -0.0062, -0.0062,  0.1166, -0.0674,
           0.0798,  0.2148,  0.2270,  0.2638, -0.1166, -0.0062,  0.0184, -0.1780,
          -0.2760};
+
+
+void hamming_distance_similarity(int & hamming_distance, float hv1[DIMENSION], float hv2[DIMENSION]){
+  hamming_distance = 0;
+
+  for (int i = 0; i < DIMENSION; i++) {
+    if (hv1[i] != hv2[i]) {
+      hamming_distance++;
+    }
+  }
+}
+
+
 
 
 ID_Level_Encoder::ID_Level_Encoder(int n) {
@@ -193,7 +206,7 @@ void ID_Level_Encoder::level_hv() {
 
 
 
-void ID_Level_Encoder::bind(double* value) {
+void ID_Level_Encoder::bind(float* value) {
   const double range_from = 0.0;
   const double range_to = 1.0;
   int target[num_vectors];
@@ -250,36 +263,86 @@ void ID_Level_Encoder::hard_quantize(){
 
 
 
-void ID_Level_Encoder::ID_Level_Forward(double* x) {
+void ID_Level_Encoder::ID_Level_Forward(float* x) {
   bind(x);
   multiset();
   hard_quantize();
 }
 
 
-/*int main() {
-  // put your setup code here, to run once:
-  srand(time(0));
-  int num_vec = sizeof(y)/sizeof(y[0]); // size of isolet dataset
-  ID_Level_Encoder* encoder = new ID_Level_Encoder(num_vec);
-  encoder->ID_Level_Forward(y);
-  double* sample = encoder->sample_hv;
-  for (int i = 0; i < DIMENSION; i++)
-    cout << sample[i];
-  cout << endl;
-  return 0;
-}*/
-
 
 void setup() {
   Serial.begin(9600);
+
+  //class: 25
+  float SameC1[10] = {-0.5752,  0.0264,  0.4010,  0.3694, -0.2164, -0.3166, -0.3694, -0.4828,
+         -0.5198, -0.3878};
+  float SameC2[10] = {-0.6498,  0.0556,  0.2536,  0.2632, -0.2632, -0.3672, -0.4542, -0.4710,
+         -0.4324, -0.3478};
+  //class: 0
+  float DiffC[10] = {-0.5038, -0.2724, -0.0958,  0.4004,  0.7352,  0.8326,  0.4978,  0.1902,
+          0.1050,  0.1812};
+
+
+  //initializing empty vectors
+  float resultC1[DIMENSION] = {0};
+  float resultC2[DIMENSION] = {0};
+  float resultDiffC[DIMENSION] = {0};
+
+  //initializing empty hamming distances
+  int hamming_distanceSame = 0;
+  int hamming_distance1vDiff = 0;
+  int hamming_distance2vDiff = 0;
+
+
+  int num_vec = sizeof(SameC1)/sizeof(SameC1[0]); // size of data sample
+  ID_Level_Encoder* enc1 = new ID_Level_Encoder(num_vec);
+  enc1->ID_Level_Forward(SameC1);
+  double* sample = enc1->sample_hv;
+
+
+
+
+  //Generating random hyper vectors for each tensor
+  Projection(10, DIMENSIONS, SameC1, resultC1);
+  hard_quantize(resultC1);
+
+  Projection(10, DIMENSIONS, SameC2, resultC2);
+  hard_quantize(resultC2);
+
+  Projection(10, DIMENSIONS, DiffC, resultDiffC);
+  hard_quantize(resultDiffC);
+
+  //Finding the difference between each pair of hyper vectors
+  hamming_distance_similarity(hamming_distanceSame, resultC1, resultC2);
+  hamming_distance_similarity(hamming_distance1vDiff, resultC1, resultDiffC);
+  hamming_distance_similarity(hamming_distance2vDiff, resultC2, resultDiffC);
+
+
+
+  //Printing the differences
+  Serial.print("Same class diff: ");
+  Serial.println(hamming_distanceSame);
+
+  Serial.print("Diff class between first and different: ");
+  Serial.println(hamming_distance1vDiff);
+
+  Serial.print("Diff class between second and different: ");
+  Serial.println(hamming_distance2vDiff);
+
 }
+
+
+
+
+
 
 
 
 void loop() {
   // put your main code here, to run repeatedly:
 
+  /* 
   srand(time(0));
   int num_vec = sizeof(y)/sizeof(y[0]); // size of isolet dataset
   ID_Level_Encoder* encoder = new ID_Level_Encoder(num_vec);
@@ -293,4 +356,26 @@ void loop() {
       Serial.print(", ");
     }
   }
+  */
+
 }
+
+
+
+// -------------------------------------------------------------
+
+/*
+ * C code:
+ */
+/*int main() {
+  // put your setup code here, to run once:
+  srand(time(0));
+  int num_vec = sizeof(y)/sizeof(y[0]); // size of isolet dataset
+  ID_Level_Encoder* encoder = new ID_Level_Encoder(num_vec);
+  encoder->ID_Level_Forward(y);
+  double* sample = encoder->sample_hv;
+  for (int i = 0; i < DIMENSION; i++)
+    cout << sample[i];
+  cout << endl;
+  return 0;
+}*/
