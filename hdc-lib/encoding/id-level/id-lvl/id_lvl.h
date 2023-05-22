@@ -7,14 +7,13 @@
 #include <stdlib.h>
 #include <time.h>
 #include <iostream>
-#include <vector>
 #include <algorithm>
 #include <cmath>
 #include <random>
 
 using namespace std;
 
-#define DIMENSION 1000   // Size of hypervector
+#define DIMENSION 100   // Size of hypervector
 #define NUM_LEVELS 100
 #define RANDOMNESS 0
 
