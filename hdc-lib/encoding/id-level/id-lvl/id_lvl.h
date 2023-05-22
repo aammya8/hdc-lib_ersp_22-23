@@ -1,7 +1,8 @@
 #ifndef id_lvl_h
 #define id_lvl_h
 
-#include <stdio.h>
+#include "Arduino.h"
+
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>

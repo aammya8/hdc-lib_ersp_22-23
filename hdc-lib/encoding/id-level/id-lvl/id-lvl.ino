@@ -4,7 +4,6 @@ ID-Level Encoding
 
 #include "id_lvl.h"
 
-//class: 25
 float a[10] = {-0.5752,  0.0264,  0.4010,  0.3694, -0.2164, -0.3166, -0.3694, -0.4828,
         -0.5198, -0.3878};
 float b[10] = {-0.6498,  0.0556,  0.2536,  0.2632, -0.2632, -0.3672, -0.4542, -0.4710,
@@ -286,7 +285,7 @@ int hamming_distance_similarity(int hv1[], int hv2[]) {
 
 void setup() {
   Serial.begin(9600);
-  srand(time(0));
+  srand(10);
 
   //frist sample
   ID_Level_Encoder* encoder = new ID_Level_Encoder(num_vertcors);
@@ -327,6 +326,9 @@ void setup() {
   int dis2 = hamming_distance_similarity(hv1, hv3);
   Serial.print(" distance between two data in a different class: ");
   Serial.print(dis2);
+  int dis3 = hamming_distance_similarity(hv2, hv3);
+  Serial.print(" distance between two data in a different class: ");
+  Serial.print(dis3);
   
 
 }
