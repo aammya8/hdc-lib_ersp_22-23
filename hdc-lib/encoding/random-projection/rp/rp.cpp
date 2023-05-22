@@ -7,10 +7,15 @@
 #include <math.h>
 #include <random>
 #include <vector>
-// statistic c library: https://github.com/christianbender/statistic
-// #include <statistic.h>
 
 using namespace std;
+
+// number of hypervector dimensions
+const double DIMENSIONS = 1000;
+
+// number of features in dataset
+const double NUM_FEATURES = 5;
+
 
 /*
  * Torch functions:
@@ -20,27 +25,29 @@ using namespace std;
  * normalize
  */
 
+//Finds the bit difference between two hypervectors
+int hamming_distance_similarity (vector<float> hv1, vector<float> hv2)
+{
+  int hamming_distance = 0;
+
+  for (int i = 0; i < DIMENSIONS; i++) {
+    if (hv1[i] != hv2[i]) {
+      hamming_distance++;
+    }
+  }
+  return hamming_distamce;
+}
+
+
 //Applies binary quantization to all elements of the input tensor.
 vector<float> hard_quantize (vector<float> x)
 {
-  // ex usage: torchhd.hard_quantize(sample_hv)
-  //tensor([ 2.,  0., -2.,  0.,  2.,  0.])
-  // >>> torchhd.hard_quantize(y)
-  //tensor([ 1., -1., -1., -1.,  1., -1.])
-  // torch.bincount(input, weights=None, minlength=0)
-
-  //for item in array
-  //if item <= 0
-  //item = 0
-  //else: item = 1
   vector<float> hqVector(x.size());
   for(int i = 0; i < x.size(); i++) {
     if (x[i] <= 0) {
         hqVector[i] = -1;
-        //hqVector.push_back(0);
     } else {
       hqVector[i] = 1;
-      //hqVector.push_back(1);
     }
   }
   return hqVector;
@@ -133,11 +140,6 @@ vector<float> Projection(int in_features, int out_features, vector<float>tensor)
   return result;
 }
 
-// number of hypervector dimensions
-const double DIMENSIONS = 1000;
-
-// number of features in dataset
-const double NUM_FEATURES = 5;
 
 class RP_Encoder {
   public:
@@ -174,14 +176,26 @@ class RP_Encoder {
 };
 
 int main() {
-  // correct output: ([[-1.,  1., -1.,  ..., -1.,  1., -1.]])
-    vector<float> x = {-0.6624, -0.3334,  0.3666,  0.4292, -0.2084};
-         
+  //class: 25
+  vector<float> SameC1 = {-0.5752,  0.0264,  0.4010,  0.3694, -0.2164, -0.3166, -0.3694, -0.4828,
+         -0.5198, -0.3878};
+  vector<float> SameC2 = {-0.6498,  0.0556,  0.2536,  0.2632, -0.2632, -0.3672, -0.4542, -0.4710,
+         -0.4324, -0.3478};
+  //class: 0
+  vector<float> DiffC = {-0.5038, -0.2724, -0.0958,  0.4004,  0.7352,  0.8326,  0.4978,  0.1902,
+          0.1050,  0.1812};
+
+
   RP_Encoder np;
-  vector<float> sample = np.encode(x, x.size());
-  for(float elements: sample){
-    cout << elements << endl;
-  }
-  cout << endl;
+  vector<float> sample1 = np.encode(SameC1, SameC1.size());
+  vector<float> sample2 = np.encode(SameC2, SameC2.size());
+  vector<float> sample3 = np.encode(DiffC, DiffC.size());
+  int diffC1vC2 = hamming_distance_similarity(sample1, sample2);
+  int diffC1vDiff = hamming_distance_similarity(sample1, sample3);
+  int diffC2vDiff = hamming_distance_similarity(sample3, sample2);
+  
+  cout << "difference between data in same class: " << diffC1vC2 << endl;
+  cout << "difference between data in different class (first and last vector): " << diffC1vDiff << endl;
+  cout << "difference between data in different class (second and last vector): " << diffC2vDiff << endl;
   return 0;
 }

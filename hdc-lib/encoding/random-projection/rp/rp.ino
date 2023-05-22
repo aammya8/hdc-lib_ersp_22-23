@@ -64,16 +64,16 @@ void normalize(float input[DIMENSIONS][10])
 /*
  * Projection: does matrix multiplication with the input tensor/data (vector<float>)
  * and a randomly generated matrix to produce a random hypervector
- * @param in_features = dimension of the input vector
- * @param out_features (1000) = output dimension of the hypervector
+ * @param seed - a random seed value for the normal distribution generator
+ * @param in_features - dimension of the input vector
+ * @param out_features (1000) - output dimension of the hypervector
  */
-void Projection(int in_features, int out_features, float tensor[10], float result[DIMENSIONS]){
+void Projection(int seed, int in_features, int out_features, float tensor[10], float result[DIMENSIONS]){
   // instantiating matrix with rows and columns
   float weight[out_features][10];
   
   // filling matrix with rnd normal distribution
-  srand(time(NULL)); // Set a random seed value
-  default_random_engine generator(rand()); // Use the seed value for the random engine
+  default_random_engine generator(seed); // Use the seed value for the random engine
   normal_distribution<float> distribution(0,1);
 
   for (int row = 0; row < out_features; ++row){
@@ -114,14 +114,17 @@ void setup() {
   int hamming_distance1vDiff = 0;
   int hamming_distance2vDiff = 0;
   
+  //Generating random seed value
+  int seed = random(100000);
+
   //Generating random hyper vectors for each tensor
-  Projection(10, DIMENSIONS, SameC1, resultC1);
+  Projection(seed, 10, DIMENSIONS, SameC1, resultC1);
   hard_quantize(resultC1);
 
-  Projection(10, DIMENSIONS, SameC2, resultC2);
+  Projection(seed, 10, DIMENSIONS, SameC2, resultC2);
   hard_quantize(resultC2);
 
-  Projection(10, DIMENSIONS, DiffC, resultDiffC);
+  Projection(seed, 10, DIMENSIONS, DiffC, resultDiffC);
   hard_quantize(resultDiffC);
 
   //Finding the difference between each pair of hyper vectors
