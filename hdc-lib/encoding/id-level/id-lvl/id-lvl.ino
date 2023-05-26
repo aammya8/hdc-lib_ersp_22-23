@@ -284,6 +284,11 @@ int hamming_distance_similarity(int hv1[], int hv2[]) {
 
 
 void setup() {
+
+  long int t1 = millis();
+
+
+  
   Serial.begin(9600);
   srand(10);
 
@@ -297,6 +302,11 @@ void setup() {
     hv1[i] = first[i];
     Serial.print(first[i]);
   }
+
+  long int t2 = millis();
+  Serial.print("Time taken by the task: "); 
+  Serial.print(t2-t1); 
+  Serial.println(" milliseconds");
 
 
   //second sample with the same encoder as the first one
@@ -330,6 +340,7 @@ void setup() {
   Serial.print(" distance between two data in a different class: ");
   Serial.print(dis3);
   
+
 
 }
 
