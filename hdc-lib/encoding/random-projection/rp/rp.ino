@@ -1,3 +1,7 @@
+/**
+ * This file contains the arduino code for random projection
+ */
+
 // imports
 #include <stdio.h>
 #include <iostream>
@@ -12,7 +16,7 @@ const unsigned int DIMENSIONS = 300;
 // number of features in dataset
 const unsigned NUM_FEATURES = 10;
 
-/*
+/**
  * hamming_distance_similarity: finds the bit difference between two hypervectors
  * @param hamming_distance - an integer variable to be filled with how many bits differ
  * @param hv1 - a hypervector to be compared
@@ -28,7 +32,7 @@ void hamming_distance_similarity(int & hamming_distance, float hv1[DIMENSIONS], 
   }
 }
 
-/*
+/**
  * hard_quantize: applies binary quantization to all elements of the input tensor
  * @param x - a vector with positive and negative float values
  */
@@ -42,7 +46,7 @@ void hard_quantize (float x[DIMENSIONS]){
   }
 }
 
-/*
+/**
  * normalize: performs normalization of inputs by rows (dimension = 1)
  * @param input - a 2D vector with random normal distribution values
  */
@@ -61,7 +65,7 @@ void normalize(float input[DIMENSIONS][10])
   }
 }
 
-/*
+/**
  * Projection: does matrix multiplication with the input tensor/data (vector<float>)
  * and a randomly generated matrix to produce a random hypervector
  * @param seed - a random seed value for the normal distribution generator
@@ -95,29 +99,29 @@ void Projection(int seed, int in_features, int out_features, float tensor[10], f
 
 void setup() {
   Serial.begin(9600);
-  //class: 25
+  // class: 25
   float SameC1[10] = {-0.5752,  0.0264,  0.4010,  0.3694, -0.2164, -0.3166, -0.3694, -0.4828,
          -0.5198, -0.3878};
   float SameC2[10] = {-0.6498,  0.0556,  0.2536,  0.2632, -0.2632, -0.3672, -0.4542, -0.4710,
          -0.4324, -0.3478};
-  //class: 0
+  // class: 0
   float DiffC[10] = {-0.5038, -0.2724, -0.0958,  0.4004,  0.7352,  0.8326,  0.4978,  0.1902,
           0.1050,  0.1812};
   
-  //initializing empty vectors
+  // initializing empty vectors
   float resultC1[DIMENSIONS] = {0};
   float resultC2[DIMENSIONS] = {0};
   float resultDiffC[DIMENSIONS] = {0};
 
-  //initializing empty hamming distances
+  // initializing empty hamming distances
   int hamming_distanceSame = 0;
   int hamming_distance1vDiff = 0;
   int hamming_distance2vDiff = 0;
   
-  //Generating random seed value
+  // Generating random seed value
   int seed = random(100000);
 
-  //Generating random hyper vectors for each tensor
+  // Generating random hyper vectors for each tensor
   Projection(seed, 10, DIMENSIONS, SameC1, resultC1);
   hard_quantize(resultC1);
 
@@ -127,12 +131,12 @@ void setup() {
   Projection(seed, 10, DIMENSIONS, DiffC, resultDiffC);
   hard_quantize(resultDiffC);
 
-  //Finding the difference between each pair of hyper vectors
+  // Finding the difference between each pair of hyper vectors
   hamming_distance_similarity(hamming_distanceSame, resultC1, resultC2);
   hamming_distance_similarity(hamming_distance1vDiff, resultC1, resultDiffC);
   hamming_distance_similarity(hamming_distance2vDiff, resultC2, resultDiffC);
 
-  //Printing the differences
+  // Printing the differences
   Serial.print("Same class diff: ");
   Serial.println(hamming_distanceSame);
 

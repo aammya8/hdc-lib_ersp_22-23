@@ -1,6 +1,7 @@
 /*
- * C++ version code
+ * This file contains the C++ version random projection code
  */
+
 // imports
 #include <stdio.h>
 #include <iostream>
@@ -16,16 +17,13 @@ const double DIMENSIONS = 1000;
 // number of features in dataset
 const double NUM_FEATURES = 5;
 
-
-/*
- * Torch functions:
- * hard_quantize
- * Sinusoid
- * linear 
- * normalize
+/**
+ * Hamming_distance_similarity: finds the bit difference between two hypervectors
+ * @param hv1 = the first hypervector
+ * @param hv2 = the second hypervector
+ * @returns an integer value of the number of differences between the two hypervectors
  */
-
-//Finds the bit difference between two hypervectors
+Finds the bit difference between two hypervectors
 int hamming_distance_similarity (vector<float> hv1, vector<float> hv2)
 {
   int hamming_distance = 0;
@@ -39,7 +37,11 @@ int hamming_distance_similarity (vector<float> hv1, vector<float> hv2)
 }
 
 
-//Applies binary quantization to all elements of the input tensor.
+/**
+ * Hard_quantize: applies binary quantization to all elements of the input tensor
+ * @param x = the input tensor
+ * @returns vector with binary values
+ */
 vector<float> hard_quantize (vector<float> x)
 {
   vector<float> hqVector(x.size());
@@ -53,24 +55,9 @@ vector<float> hard_quantize (vector<float> x)
   return hqVector;
 }
 
-/*
- * multiply by the weight and add the bias
- */
-//  void linear(float input, float weight, float output) {
-//     // Iterate over the elements of the output vector
-//     for (int i = 0; i < output.size(); i++) {
-//         //Initialize the i-th element of the output vector to zero
-//         output[i] = 0;
-//         // Iterate over the columns of the weight matrix
-//         for (int j = 0; j < DIMENSIONS; j++) {
-//             //dot product of the input vector and the weight matrix
-//             output[i] += input[j] * weight[i*COLS + j];
-//         }
-//     }
-// }
-
-/*
- * performs normalization of inputs by rows (dimension = 1)
+/**
+ * Normalize: performs normalization of inputs by rows (dimension = 1)
+ * @param input = 2 dimensional vector with data that requires normalization
  */
 void normalize(vector<vector<float>> &input)
 {
@@ -91,20 +78,13 @@ void normalize(vector<vector<float>> &input)
 }
 
 
-/*
+/**
  * Projection: does matrix multiplication with the input tensor/data (vector<float>)
  * and a randomly generated matrix to produce a random hypervector
  * @param in_features = dimension of the input vector
  * @param out_features (1000) = output dimension of the hypervector
  * @return = random generated hypervector
  */
-
-// DONE - TODO: CREATING THE RANDOM MATRIX
- // DONE - Step 1: generate the random empty matrix with dimensions of out_features
- // DONE - Step 2: fill matrix with random normal distribution values  with LIBRARY
- // weight = https://www.tutorialspoint.com/generate-random-numbers-following-a-normal-distribution-in-c-cplusplus
- // DONE - Step 3: normalize weight
- //
 
 vector<float> Projection(int in_features, int out_features, vector<float>tensor){
   // instantiating matrix with rows
@@ -140,7 +120,9 @@ vector<float> Projection(int in_features, int out_features, vector<float>tensor)
   return result;
 }
 
-
+/**
+ * RP_Encoder: a class for random projection with a constructor and a class function
+ */
 class RP_Encoder {
   public:
     float lr;
@@ -156,32 +138,16 @@ class RP_Encoder {
       this->project = hard_quantize(this->project); 
       return this->project;
     }
-
-     /*
-     * model_update: creates a model for linear regression
-     * used for reghd.py, but ours is random projection
-     */
-    // void model_update(vector<float> x, int y) {
-    //   vector<float> update = this->M + this->lr*(y-(linear(x, this->M)))*x;
-    //   update = update.mean(0);
-    //   this->M = update;
-    // }
-
-    // forward defined within the class SingleModel
-    // vector<float> forward(vector<float> x) {
-    //   vector<float> enc = encode(x, x.size());
-    //   // vector<float> res = linear(enc, this->M); NOT NECESSARY FOR RP
-    //   return res;
-    // }
 };
 
 int main() {
-  //class: 25
+  // Data retrieved from the ISOLET data set
+  // class: 25
   vector<float> SameC1 = {-0.5752,  0.0264,  0.4010,  0.3694, -0.2164, -0.3166, -0.3694, -0.4828,
          -0.5198, -0.3878};
   vector<float> SameC2 = {-0.6498,  0.0556,  0.2536,  0.2632, -0.2632, -0.3672, -0.4542, -0.4710,
          -0.4324, -0.3478};
-  //class: 0
+  // class: 0
   vector<float> DiffC = {-0.5038, -0.2724, -0.0958,  0.4004,  0.7352,  0.8326,  0.4978,  0.1902,
           0.1050,  0.1812};
 
